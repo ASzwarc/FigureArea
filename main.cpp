@@ -89,13 +89,23 @@ private:
 class Polygon: public FigureInterface
 {
 public:
-    Polygon():
-        FigureInterface(FigureType::Polygon)
+    Polygon(unsigned int vertexCount, std::vector<std::pair<int, int>>&& vertices):
+        FigureInterface(FigureType::Polygon),
+        vertexCount_(vertexCount),
+        vertices_(std::move(vertices))
     {}
+    virtual int calculateArea() const override
+    {
+        for(const auto& elem: vertices_)
+        {
+            std::cout << elem.first << ", " << elem.second << std::endl;
+        }
+        return 0;
+    }
 private:
-
-
-}
+    unsigned int vertexCount_;
+    std::vector<std::pair<int, int>> vertices_;
+};
 
 class CumulativeAreaCalc
 {
@@ -121,6 +131,8 @@ public:
 private:
     int addFigure(const char* data, unsigned int index)
     {
+        int verticesCount;
+        std::vector<std::pair<int, int>> vertices;
         FigureType figureType = static_cast<FigureType>(data[index]);
         switch(figureType)
         {
@@ -131,6 +143,13 @@ private:
                 figuresList_.push_back(std::make_unique<Circle>(static_cast<unsigned int>(data[index + 3])));
                 return index + 4;
             case FigureType::Polygon:
+                verticesCount = static_cast<unsigned int>(data[index + 1]);
+                vertices.reserve(verticesCount);
+                for(unsigned int i = index + 2; i < (index + 1 + (2 * verticesCount)); i += 2)
+                {
+                    vertices.emplace_back(std::make_pair<int, int>(static_cast<int>(data[i]), static_cast<int>(data[i])));
+                }
+                figuresList_.push_back(std::make_unique<Polygon>(verticesCount, std::move(vertices)));
                 return 0;
             case FigureType::Rectangle:
                 figuresList_.push_back(std::make_unique<Rectangle>(static_cast<unsigned int>(data[index + 3]),
@@ -180,4 +199,16 @@ SCENARIO("Area of singular figure can be calculated", "[basic tests]")
             REQUIRE(calculator.calculateArea() == 706);
         }
     }
+/*
+    GIVEN("Polygon data")
+    {
+        const char data[] = {3, 4, 0, 0, 0, 1, 1, 1, 1, 0};
+        int dataSize{10};
+        THEN("Proper area is calculated")
+        {
+            calculator.readData(data, dataSize);
+            REQUIRE(calculator.calculateArea() == 1);
+        }
+    }
+    */
 }
