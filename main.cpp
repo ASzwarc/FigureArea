@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <list>
+#include <cstdlib>
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
@@ -96,11 +97,19 @@ public:
     {}
     virtual int calculateArea() const override
     {
-        for(const auto& elem: vertices_)
+        using ConstIter = std::vector<std::pair<int, int>>::const_iterator;
+        int sum = 0;
+        for(ConstIter it = std::begin(vertices_); it != std::end(vertices_); ++it)
         {
-            std::cout << elem.first << ", " << elem.second << std::endl;
+            if (it + 1 >= std::end(vertices_))
+            {
+                ConstIter firstElem = std::begin(vertices_);
+                sum += ((it->first) * (firstElem->second)) - ((it->second) * (firstElem->first));
+                break;
+            }
+            sum += ((it->first) * ((it + 1)->second)) - ((it->second) * ((it + 1)->first));
         }
-        return 0;
+        return std::abs(sum / 2);
     }
 private:
     unsigned int vertexCount_;
