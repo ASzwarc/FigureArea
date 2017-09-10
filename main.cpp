@@ -147,10 +147,10 @@ private:
                 vertices.reserve(verticesCount);
                 for(unsigned int i = index + 2; i < (index + 1 + (2 * verticesCount)); i += 2)
                 {
-                    vertices.emplace_back(std::make_pair<int, int>(static_cast<int>(data[i]), static_cast<int>(data[i])));
+                    vertices.emplace_back(std::make_pair<int, int>(static_cast<int>(data[i]), static_cast<int>(data[i + 1])));
                 }
                 figuresList_.push_back(std::make_unique<Polygon>(verticesCount, std::move(vertices)));
-                return 0;
+                return index + 2 + verticesCount * 2;
             case FigureType::Rectangle:
                 figuresList_.push_back(std::make_unique<Rectangle>(static_cast<unsigned int>(data[index + 3]),
                                                                    static_cast<unsigned int>(data[index + 4])
@@ -199,7 +199,7 @@ SCENARIO("Area of singular figure can be calculated", "[basic tests]")
             REQUIRE(calculator.calculateArea() == 706);
         }
     }
-/*
+
     GIVEN("Polygon data")
     {
         const char data[] = {3, 4, 0, 0, 0, 1, 1, 1, 1, 0};
@@ -210,5 +210,4 @@ SCENARIO("Area of singular figure can be calculated", "[basic tests]")
             REQUIRE(calculator.calculateArea() == 1);
         }
     }
-    */
 }
