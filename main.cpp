@@ -220,3 +220,23 @@ SCENARIO("Area of singular figure can be calculated", "[basic tests]")
         }
     }
 }
+
+SCENARIO("Area of 4 figures can be calculated", "[basic tests]")
+{
+    CumulativeAreaCalc calculator;
+    GIVEN("Square, rectangle, circle and polygon data")
+    {
+        const char data[] = {
+            1, 0, 0, 20, // square [figure_id, x, y, size]
+            2, 10, 10, 20, 30, // rectangle [figure_id, x, y, size_x, size_y]
+            3, 6, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, // polygon [figure_id, vertex_count, x1, y1, x2, y2, x3, y3, ..., x_vertex_count, y_vertex_count]
+            4, -10, -10, 15 // circle [figure_id, x, y, radius]
+        };
+        int dataSize{27};
+        THEN("Cumulative area is calculated")
+        {
+            calculator.readData(data, dataSize);
+            REQUIRE(calculator.calculateArea() == 1706);
+        }
+    }
+}
