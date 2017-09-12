@@ -1,18 +1,10 @@
-#include <iostream>
 #include <memory>
 #include <list>
-#include <cstdlib>
+
+#include "figures.hpp"
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-
-enum class FigureType
-{
-    Square = 1,
-    Rectangle = 2,
-    Polygon = 3,
-    Circle = 4,
-};
 
 /*
 Assumptions:
@@ -27,94 +19,6 @@ Example data:
     4, -10, -10, 15 // circle [figure_id, x, y, radius]
     };
 */
-
-class FigureInterface
-{
-public:
-    FigureInterface(FigureType type):
-        type_(type)
-    {}
-    virtual int calculateArea() const = 0;
-private:
-    FigureType type_;
-};
-
-class Square: public FigureInterface
-{
-public:
-    Square(unsigned int size):
-        FigureInterface(FigureType::Rectangle),
-        size_(size)
-    {}
-    virtual int calculateArea() const override
-    {
-        return size_*size_;
-    }
-private:
-    unsigned int size_;
-};
-
-class Rectangle: public FigureInterface
-{
-public:
-    Rectangle(unsigned int size_x, unsigned int size_y):
-        FigureInterface(FigureType::Rectangle),
-        size_x_(size_x),
-        size_y_(size_y)
-    {}
-    virtual int calculateArea() const override
-    {
-        return size_x_*size_y_;
-    }
-private:
-    unsigned int size_x_;
-    unsigned int size_y_;
-};
-
-class Circle: public FigureInterface
-{
-public:
-    Circle(unsigned int radius):
-        FigureInterface(FigureType::Circle),
-        radius_(radius)
-    {}
-    virtual int calculateArea() const override
-    {
-        return pi_ * radius_ * radius_;
-    }
-private:
-    unsigned int radius_;
-    float pi_{3.14};
-};
-
-class Polygon: public FigureInterface
-{
-public:
-    Polygon(unsigned int vertexCount, std::vector<std::pair<int, int>>&& vertices):
-        FigureInterface(FigureType::Polygon),
-        vertexCount_(vertexCount),
-        vertices_(std::move(vertices))
-    {}
-    virtual int calculateArea() const override
-    {
-        using ConstIter = std::vector<std::pair<int, int>>::const_iterator;
-        int sum = 0;
-        for(ConstIter it = std::begin(vertices_); it != std::end(vertices_); ++it)
-        {
-            if (it + 1 >= std::end(vertices_))
-            {
-                ConstIter firstElem = std::begin(vertices_);
-                sum += ((it->first) * (firstElem->second)) - ((it->second) * (firstElem->first));
-                break;
-            }
-            sum += ((it->first) * ((it + 1)->second)) - ((it->second) * ((it + 1)->first));
-        }
-        return std::abs(sum / 2);
-    }
-private:
-    unsigned int vertexCount_;
-    std::vector<std::pair<int, int>> vertices_;
-};
 
 class CumulativeAreaCalc
 {
@@ -140,6 +44,8 @@ public:
 private:
     int addFigure(const char* data, unsigned int index)
     {
+        using namespace figures;
+
         int verticesCount;
         std::vector<std::pair<int, int>> vertices;
         FigureType figureType = static_cast<FigureType>(data[index]);
@@ -170,7 +76,7 @@ private:
         return 0;
     }
 
-    std::list<std::unique_ptr<FigureInterface>> figuresList_;
+    std::list<std::unique_ptr<figures::FigureInterface>> figuresList_;
 };
 
 SCENARIO("Area of singular figure can be calculated", "[basic tests]")
@@ -227,10 +133,10 @@ SCENARIO("Area of 4 figures can be calculated", "[basic tests]")
     GIVEN("Square, rectangle, circle and polygon data")
     {
         const char data[] = {
-            1, 0, 0, 20, // square [figure_id, x, y, size]
-            2, 10, 10, 20, 30, // rectangle [figure_id, x, y, size_x, size_y]
-            3, 6, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, // polygon [figure_id, vertex_count, x1, y1, x2, y2, x3, y3, ..., x_vertex_count, y_vertex_count]
-            4, -10, -10, 15 // circle [figure_id, x, y, radius]
+            1, 0, 0, 20,
+            2, 10, 10, 20, 30,
+            3, 6, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6,
+            4, -10, -10, 15
         };
         int dataSize{27};
         THEN("Cumulative area is calculated")
