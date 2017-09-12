@@ -49,6 +49,7 @@ private:
         int verticesCount;
         std::vector<std::pair<int, int>> vertices;
         FigureType figureType = static_cast<FigureType>(data[index]);
+        //TODO This code should be changed to be more expressive and extendible. Right now it is rather brute-forced...
         switch(figureType)
         {
             case FigureType::Square:
@@ -78,6 +79,8 @@ private:
 
     std::list<std::unique_ptr<figures::FigureInterface>> figuresList_;
 };
+
+//TODO Refactor test. Currently these are module tests, not UTs
 
 SCENARIO("Area of singular figure can be calculated", "[basic tests]")
 {
