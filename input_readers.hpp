@@ -12,7 +12,7 @@ public:
     unsigned int read(const char* data, unsigned int index);
 private:
     int sizeDataOffset_ {3};
-    int nextFigureDataOffset_ {4};
+    int nextFigureIndexOffset_ {4};
 
 };
 
@@ -23,7 +23,7 @@ public:
 private:
     int sizeXDataOffset_ {3};
     int sizeYDataOffset_ {4};
-    int nextFigureDataOffset_ {5};
+    int nextFigureIndexOffset_ {5};
 
 };
 
@@ -33,7 +33,7 @@ public:
     unsigned int read(const char* data, unsigned int index);
 private:
     int radiusDataOffset_ {3};
-    int nextFigureDataOffset_ {4};
+    int nextFigureIndexOffset_ {4};
 };
 
 class PolygonData
@@ -41,7 +41,8 @@ class PolygonData
 public:
     unsigned int read(const char* data, unsigned int index);
 private:
-    int firstVerticeDataOffset_ {2};
+    int verticesCountIndexOffset_ {1};
+    int firstVerticeIndexOffset_ {2};
     int elementCountInVertice_ {2};
 };
 
