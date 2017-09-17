@@ -2,7 +2,7 @@
 #include "catch.hpp"
 #include "figures.hpp"
 
-SCENARIO("Area of singular figure can be read", "[input readers tests]")
+SCENARIO("Data for singular figure can be read", "[input readers tests]")
 {
     GIVEN("Square data")
     {
@@ -48,24 +48,3 @@ SCENARIO("Area of singular figure can be read", "[input readers tests]")
         }
     }
 }
-/*
-SCENARIO("Area of 4 figures can be calculated", "[basic tests]")
-{
-    CumulativeAreaCalc calculator;
-    GIVEN("Square, rectangle, circle and polygon data")
-    {
-        const char data[] = {
-            1, 0, 0, 20,
-            2, 10, 10, 20, 30,
-            3, 6, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6,
-            4, -10, -10, 15
-        };
-        int dataSize{27};
-        THEN("Cumulative area is calculated")
-        {
-            calculator.readData(data, dataSize);
-            REQUIRE(calculator.calculateArea() == 1706);
-        }
-    }
-    
-}*/
