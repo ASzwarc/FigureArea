@@ -9,15 +9,26 @@
 namespace readers
 {
 
-template<typename FigureType>
-class SquareData
+class DataReaderInterface
 {
 public:
-    unsigned int read(const char* data, unsigned int index)
+    virtual unsigned int read(const char* data, unsigned int index) = 0;
+    virtual int getFigureArea() const = 0;
+};
+
+template<typename FigureType>
+class SquareData: public DataReaderInterface
+{
+public:
+    unsigned int read(const char* data, unsigned int index) override
     {
         int size = static_cast<unsigned int>(data[index + sizeDataOffset_]);
         figure_ = std::make_unique<figures::Square>(size);
         return index + nextFigureIndexOffset_;
+    }
+    int getFigureArea() const override
+    {
+        return figure_->calculateArea();
     }
 private:
     int sizeDataOffset_ {3};
@@ -26,15 +37,19 @@ private:
 };
 
 template<typename FigureType>
-class RectangleData
+class RectangleData: public DataReaderInterface
 {
 public:
-    unsigned int read(const char* data, unsigned int index)
+    unsigned int read(const char* data, unsigned int index) override
     {
         int size_x = static_cast<unsigned int>(data[index + sizeXDataOffset_]);
         int size_y = static_cast<unsigned int>(data[index + sizeYDataOffset_]);
         figure_ = std::make_unique<figures::Rectangle>(size_x, size_y);
         return index + nextFigureIndexOffset_;
+    }
+    int getFigureArea() const override
+    {
+        return figure_->calculateArea();
     }
 private:
     int sizeXDataOffset_ {3};
@@ -44,14 +59,18 @@ private:
 };
 
 template<typename FigureType>
-class CircleData
+class CircleData: public DataReaderInterface
 {
 public:
-    unsigned int read(const char* data, unsigned int index)
+    unsigned int read(const char* data, unsigned int index) override
     {
         int radius = static_cast<unsigned int>(data[index + radiusDataOffset_]);
         figure_ = std::make_unique<figures::Circle>(radius);
         return index + nextFigureIndexOffset_;
+    }
+    int getFigureArea() const override
+    {
+        return figure_->calculateArea();
     }
 private:
     int radiusDataOffset_ {3};
@@ -60,10 +79,10 @@ private:
 };
 
 template<typename FigureType>
-class PolygonData
+class PolygonData: public DataReaderInterface
 {
 public:
-    unsigned int read(const char* data, unsigned int index)
+    unsigned int read(const char* data, unsigned int index) override
     {
         std::vector<std::pair<int, int>> vertices;
         int verticesCount = static_cast<unsigned int>(data[index + verticesCountIndexOffset_]);
@@ -76,6 +95,10 @@ public:
         }
         figure_ = std::make_unique<figures::Polygon>(verticesCount, std::move(vertices));
         return index + firstVerticeIndexOffset_ + verticesCount * elementCountInVertice_;
+    }
+    int getFigureArea() const override
+    {
+        return figure_->calculateArea();
     }
 private:
     int verticesCountIndexOffset_ {1};

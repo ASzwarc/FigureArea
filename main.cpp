@@ -1,7 +1,8 @@
 #include <memory>
-#include <list>
+#include <map>
 
 #include "figures.hpp"
+#include "input_readers.hpp"
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
@@ -9,61 +10,35 @@
 class CumulativeAreaCalc
 {
 public:
-    void readData(const char* data, unsigned int size)
-    {
-        for(unsigned int i = 0; i < size;)
-        {
-            i = addFigure(data, i);
-        }
-    }
-
-    int calculateArea()
-    {
-        int sum = 0.0;
-        for(const auto& elem: figuresList_)
-        {
-            sum += elem->calculateArea();
-        }
-        return sum;
-    } 
-
-private:
-    int addFigure(const char* data, unsigned int index)
+    CumulativeAreaCalc()
     {
         using namespace figures;
-
-        int verticesCount;
-        std::vector<std::pair<int, int>> vertices;
-        FigureType figureType = static_cast<FigureType>(data[index]);
-        //TODO This code should be changed to be more expressive and extendible. Right now it is rather brute-forced...
-        switch(figureType)
+        using namespace readers;
+        figureReaderMap_[FigureType::Square] = std::unique_ptr<SquareData<Square>>();
+        figureReaderMap_[FigureType::Rectangle] = std::unique_ptr<RectangleData<Rectangle>>();
+        figureReaderMap_[FigureType::Circle] = std::unique_ptr<CircleData<Circle>>();
+        figureReaderMap_[FigureType::Polygon] = std::unique_ptr<PolygonData<Polygon>>();
+    }
+    int calculateArea(const char* data, unsigned int size)
+    {
+        int sum = 0;
+        for(unsigned int i = 0; i < size;)
         {
-            case FigureType::Square:
-                figuresList_.push_back(std::make_unique<Square>(static_cast<unsigned int>(data[index + 3])));
-                return index + 4;
-            case FigureType::Circle:
-                figuresList_.push_back(std::make_unique<Circle>(static_cast<unsigned int>(data[index + 3])));
-                return index + 4;
-            case FigureType::Polygon:
-                verticesCount = static_cast<unsigned int>(data[index + 1]);
-                vertices.reserve(verticesCount);
-                for(unsigned int i = index + 2; i < (index + 1 + (2 * verticesCount)); i += 2)
-                {
-                    vertices.emplace_back(std::make_pair<int, int>(static_cast<int>(data[i]), static_cast<int>(data[i + 1])));
-                }
-                figuresList_.push_back(std::make_unique<Polygon>(verticesCount, std::move(vertices)));
-                return index + 2 + verticesCount * 2;
-            case FigureType::Rectangle:
-                figuresList_.push_back(std::make_unique<Rectangle>(static_cast<unsigned int>(data[index + 3]),
-                                                                   static_cast<unsigned int>(data[index + 4])
-                                                                  )
-                                      );
-                return index + 5;
+            i = addFigure(data, i, sum);
         }
-        return 0;
+        return sum;
     }
 
-    std::list<std::unique_ptr<figures::FigureInterface>> figuresList_;
+private:
+    int addFigure(const char* data, unsigned int index, int& cumulativeArea)
+    {
+        figures::FigureType figureType = static_cast<figures::FigureType>(data[index]);
+        unsigned int nextIndex = figureReaderMap_[figureType]->read(data, index);
+        cumulativeArea += figureReaderMap_[figureType]->getFigureArea();
+
+        return nextIndex;
+    }
+    std::map<figures::FigureType, std::unique_ptr<readers::DataReaderInterface>> figureReaderMap_;
 };
 
 //TODO Refactor test. Currently these are module tests, not UTs
@@ -77,8 +52,7 @@ SCENARIO("Area of singular figure can be calculated", "[basic tests]")
         int dataSize{4};
         THEN("Proper area is calculated")
         {
-            calculator.readData(data, dataSize);
-            REQUIRE(calculator.calculateArea() == 400.0);
+            REQUIRE(calculator.calculateArea(data, dataSize) == 400.0);
         }
     }
 
@@ -88,8 +62,7 @@ SCENARIO("Area of singular figure can be calculated", "[basic tests]")
         int dataSize{5};
         THEN("Proper area is calculated")
         {
-            calculator.readData(data, dataSize);
-            REQUIRE(calculator.calculateArea() == 600.0);
+            REQUIRE(calculator.calculateArea(data, dataSize) == 600.0);
         }
     }
 
@@ -99,8 +72,7 @@ SCENARIO("Area of singular figure can be calculated", "[basic tests]")
         int dataSize{4};
         THEN("Proper area is calculated")
         {
-            calculator.readData(data, dataSize);
-            REQUIRE(calculator.calculateArea() == 706);
+            REQUIRE(calculator.calculateArea(data, dataSize) == 706);
         }
     }
 
@@ -110,8 +82,7 @@ SCENARIO("Area of singular figure can be calculated", "[basic tests]")
         int dataSize{10};
         THEN("Proper area is calculated")
         {
-            calculator.readData(data, dataSize);
-            REQUIRE(calculator.calculateArea() == 1);
+            REQUIRE(calculator.calculateArea(data, dataSize) == 1);
         }
     }
 }
@@ -130,8 +101,7 @@ SCENARIO("Area of 4 figures can be calculated", "[basic tests]")
         int dataSize{27};
         THEN("Cumulative area is calculated")
         {
-            calculator.readData(data, dataSize);
-            REQUIRE(calculator.calculateArea() == 1706);
+            REQUIRE(calculator.calculateArea(data, dataSize) == 1706);
         }
     }
 }
