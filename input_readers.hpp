@@ -4,6 +4,8 @@
 #include <memory>
 #include <vector>
 
+#include "figures.hpp"
+
 namespace readers
 {
 
@@ -13,7 +15,8 @@ class SquareData
 public:
     unsigned int read(const char* data, unsigned int index)
     {
-        //int temp = static_cast<unsigned int>(data[index + sizeDataOffset_]);
+        int size = static_cast<unsigned int>(data[index + sizeDataOffset_]);
+        figure_ = std::make_unique<figures::Square>(size);
         return index + nextFigureIndexOffset_;
     }
 private:
@@ -28,8 +31,9 @@ class RectangleData
 public:
     unsigned int read(const char* data, unsigned int index)
     {
-        //int temp1 = static_cast<unsigned int>(data[index + sizeXDataOffset_]);
-        //int temp2 = static_cast<unsigned int>(data[index + sizeYDataOffset_]);
+        int size_x = static_cast<unsigned int>(data[index + sizeXDataOffset_]);
+        int size_y = static_cast<unsigned int>(data[index + sizeYDataOffset_]);
+        figure_ = std::make_unique<figures::Rectangle>(size_x, size_y);
         return index + nextFigureIndexOffset_;
     }
 private:
@@ -45,7 +49,8 @@ class CircleData
 public:
     unsigned int read(const char* data, unsigned int index)
     {
-        //int temp = static_cast<unsigned int>(data[index + radiusDataOffset_]);
+        int radius = static_cast<unsigned int>(data[index + radiusDataOffset_]);
+        figure_ = std::make_unique<figures::Circle>(radius);
         return index + nextFigureIndexOffset_;
     }
 private:
@@ -69,6 +74,7 @@ public:
         {
             vertices.emplace_back(std::make_pair<int, int>(static_cast<int>(data[i]), static_cast<int>(data[i + 1])));
         }
+        figure_ = std::make_unique<figures::Polygon>(verticesCount, std::move(vertices));
         return index + firstVerticeIndexOffset_ + verticesCount * elementCountInVertice_;
     }
 private:

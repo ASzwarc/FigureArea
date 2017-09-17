@@ -4,7 +4,7 @@ project(FigureArea)
 
 set(SOURCE main.cpp
            figures.cpp
-           input_readers.cpp)
+           input_readers_tests.cpp)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
