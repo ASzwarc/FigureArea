@@ -16,7 +16,7 @@ const char data[] = {
 2. Cumulative area is sum of areas of each figures. Overlaps are ignored.
 
 # ToDo:
-- [ ] Design functionality for reading input.
+- [x] Design functionality for reading input.
 - [ ] Mock figure classes in CumulativeAreaCalc tests.
-- [ ] Add UT for figure classes.
-- [ ] Move CumulativeAreaCalc to separate file.
+- [x] Add UT for figure classes.
+- [x] Move CumulativeAreaCalc to separate file.
