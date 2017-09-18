@@ -4,8 +4,11 @@ project(FigureArea)
 
 set(SOURCE main.cpp
            figures.cpp
+           area_calculator.cpp
            input_readers_tests.cpp
-           figures_tests.cpp)
+           figures_tests.cpp
+           area_calculator_tests.cpp 
+           )
 
 include_directories(${CMAKE_SOURCE_DIR})
 
