@@ -14,10 +14,10 @@ public:
     {
         using namespace figures;
         using namespace readers;
-        figureReaderMap_[FigureType::Square] = std::unique_ptr<SquareData<Square>>();
-        figureReaderMap_[FigureType::Rectangle] = std::unique_ptr<RectangleData<Rectangle>>();
-        figureReaderMap_[FigureType::Circle] = std::unique_ptr<CircleData<Circle>>();
-        figureReaderMap_[FigureType::Polygon] = std::unique_ptr<PolygonData<Polygon>>();
+        figureReaderMap_[FigureType::Square] = std::make_unique<SquareData<Square>>();
+        figureReaderMap_[FigureType::Rectangle] = std::make_unique<RectangleData<Rectangle>>();
+        figureReaderMap_[FigureType::Circle] = std::make_unique<CircleData<Circle>>();
+        figureReaderMap_[FigureType::Polygon] = std::make_unique<PolygonData<Polygon>>();
     }
     int calculateArea(const char* data, unsigned int size)
     {
