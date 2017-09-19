@@ -8,3 +8,7 @@ add_compile_options(-Wall -Wextra)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 add_subdirectory(src)
+
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif(BUILD_TESTS)
